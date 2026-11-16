@@ -86,7 +86,7 @@ def main():
                 search_term=query["term"],
                 location=query["location"],
                 results_wanted=10,
-                hours_old=72  # 测试用 72 小时
+                hours_old=24  # 测试用 72 小时
             )
             
             if jobs.empty:
