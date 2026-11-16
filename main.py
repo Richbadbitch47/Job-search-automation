@@ -57,22 +57,27 @@ def main():
         print(f"读取表格失败: {e}")
         return
     
+    
+   # 在搜索配置中加入明确的 job_type 指令
     search_queries = [
-        {"type": "Part-time", "term": "part time student english hardware", "location": "Stockholm, Sweden"},
-        {"type": "Part-time", "term": "working student english embedded", "location": "Stockholm, Sweden"},
-        {"type": "Part-time", "term": "part time english data machine learning", "location": "Stockholm, Sweden"},
-        {"type": "Part-time", "term": "part time student english energy", "location": "Stockholm, Sweden"},
-        {"type": "Summer", "term": "summer intern english electrical", "location": "Stockholm, Sweden"},
-        {"type": "Summer", "term": "summer intern english energy", "location": "Stockholm, Sweden"},
-        {"type": "Summer", "term": "summer intern english embedded", "location": "Stockholm, Sweden"},
-        {"type": "Summer", "term": "internship english machine learning", "location": "Stockholm, Sweden"}
+        # 斯德哥尔摩线下 Part-time (严格过滤 job_type="parttime")
+        {"type": "Part-time", "term": "student english hardware", "location": "Stockholm, Sweden", "job_type": "parttime"},
+        {"type": "Part-time", "term": "working student english embedded", "location": "Stockholm, Sweden", "job_type": "parttime"},
+        {"type": "Part-time", "term": "english data machine learning", "location": "Stockholm, Sweden", "job_type": "parttime"},
+        {"type": "Part-time", "term": "student english energy", "location": "Stockholm, Sweden", "job_type": "parttime"},
+        
+        # 2027 暑期实习 (严格过滤 job_type="internship")
+        {"type": "Summer", "term": "summer english electrical", "location": "Stockholm, Sweden", "job_type": "internship"},
+        {"type": "Summer", "term": "summer english energy", "location": "Stockholm, Sweden", "job_type": "internship"},
+        {"type": "Summer", "term": "summer english embedded", "location": "Stockholm, Sweden", "job_type": "internship"},
+        {"type": "Summer", "term": "english machine learning", "location": "Stockholm, Sweden", "job_type": "internship"}
     ]
     
-    # 定义黑名单：只要岗位标题包含这些词，直接丢弃
+    # 定义黑名单... (保留你之前的 exclude_titles 代码)
     exclude_titles = [
-        "thesis", "examensarbete", "exjobb", "master worker", "phd", "postdoc",  # 学术/毕设类
-        "marketing", "sales", "business development", "account manager",         # 市场/销售类
-        "hr", "recruitment", "talent", "finance", "legal", "communications"      # 职能类
+        "thesis", "examensarbete", "exjobb", "master worker", "phd", "postdoc",
+        "marketing", "sales", "business development", "account manager",
+        "hr", "recruitment", "talent", "finance", "legal", "communications"
     ]
     
     new_rows = []
@@ -83,6 +88,7 @@ def main():
                 site_name=["linkedin", "indeed"],
                 search_term=query["term"],
                 location=query["location"],
+                job_type=query["job_type"],
                 results_wanted=10,
                 hours_old=72
             )
