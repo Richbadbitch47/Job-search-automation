@@ -1,0 +1,29 @@
+name: JobSpy Internship Tracker
+
+on:
+  schedule:
+    # 每天两次：UTC 06:00 和 18:00
+    - cron: '0 6,18 * * *'
+  workflow_dispatch: # 支持你在Actions页面手动点击运行测试
+
+jobs:
+  scrape-jobs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          pip install python-jobspy pandas gspread oauth2client requests
+
+      - name: Run JobSpy Script
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+        run: python main.py
