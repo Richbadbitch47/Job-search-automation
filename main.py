@@ -57,27 +57,24 @@ def main():
         print(f"读取表格失败: {e}")
         return
     
-    
-   # 在搜索配置中加入明确的 job_type 指令
+    # 恢复宽泛的搜索词，靠 Python 过滤
     search_queries = [
-        # 斯德哥尔摩线下 Part-time (严格过滤 job_type="parttime")
-        {"type": "Part-time", "term": "student english hardware", "location": "Stockholm, Sweden", "job_type": "parttime"},
-        {"type": "Part-time", "term": "working student english embedded", "location": "Stockholm, Sweden", "job_type": "parttime"},
-        {"type": "Part-time", "term": "english data machine learning", "location": "Stockholm, Sweden", "job_type": "parttime"},
-        {"type": "Part-time", "term": "student english energy", "location": "Stockholm, Sweden", "job_type": "parttime"},
-        
-        # 2027 暑期实习 (严格过滤 job_type="internship")
-        {"type": "Summer", "term": "summer english electrical", "location": "Stockholm, Sweden", "job_type": "internship"},
-        {"type": "Summer", "term": "summer english energy", "location": "Stockholm, Sweden", "job_type": "internship"},
-        {"type": "Summer", "term": "summer english embedded", "location": "Stockholm, Sweden", "job_type": "internship"},
-        {"type": "Summer", "term": "english machine learning", "location": "Stockholm, Sweden", "job_type": "internship"}
+        {"type": "Part-time", "term": "part time student english hardware", "location": "Stockholm, Sweden"},
+        {"type": "Part-time", "term": "working student english embedded", "location": "Stockholm, Sweden"},
+        {"type": "Part-time", "term": "part time english data machine learning", "location": "Stockholm, Sweden"},
+        {"type": "Part-time", "term": "part time student english energy", "location": "Stockholm, Sweden"},
+        {"type": "Summer", "term": "summer intern english electrical", "location": "Stockholm, Sweden"},
+        {"type": "Summer", "term": "summer intern english energy", "location": "Stockholm, Sweden"},
+        {"type": "Summer", "term": "summer intern english embedded", "location": "Stockholm, Sweden"},
+        {"type": "Summer", "term": "internship english machine learning", "location": "Stockholm, Sweden"}
     ]
     
-    # 定义黑名单... (保留你之前的 exclude_titles 代码)
+    # 终极黑名单：扩充了高级全职头衔
     exclude_titles = [
         "thesis", "examensarbete", "exjobb", "master worker", "phd", "postdoc",
         "marketing", "sales", "business development", "account manager",
-        "hr", "recruitment", "talent", "finance", "legal", "communications"
+        "hr", "recruitment", "talent", "finance", "legal", "communications",
+        "senior", "lead", "manager", "head", "director", "chief", "principal"
     ]
     
     new_rows = []
@@ -88,9 +85,8 @@ def main():
                 site_name=["linkedin", "indeed"],
                 search_term=query["term"],
                 location=query["location"],
-                job_type=query["job_type"],
                 results_wanted=10,
-                hours_old=72
+                hours_old=72  # 测试用 72 小时
             )
             
             if jobs.empty:
@@ -101,15 +97,20 @@ def main():
                 title_lower = str(job.get("title", "")).lower()
                 description = str(job.get("description", "")).lower()
                 
-                # 1. 标题黑名单拦截
+                # 1. 标题黑名单拦截（学术、市场、高级管理岗）
                 if any(word in title_lower for word in exclude_titles):
                     continue
                 
-                # 2. 瑞典语描述拦截
+                # 2. Part-time 专项拦截（防伪装全职）
+                if query["type"] == "Part-time":
+                    if "full-time" in title_lower or "full time" in title_lower or "heltid" in title_lower:
+                        continue
+                
+                # 3. 瑞典语描述拦截
                 if "svenska" in description or "swedish is required" in description or "fluent in swedish" in description:
                     continue
                     
-                # 3. 去重拦截
+                # 4. 去重拦截
                 if not job_url or job_url in existing_urls:
                     continue
                     
