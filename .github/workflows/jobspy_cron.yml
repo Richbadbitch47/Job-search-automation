@@ -2,9 +2,9 @@ name: JobSpy Internship Tracker
 
 on:
   schedule:
-    # 每天两次：UTC 06:00 和 18:00
-    - cron: '0 6,18 * * *'
-  workflow_dispatch: # 支持你在Actions页面手动点击运行测试
+    # 仅工作日(周一至周五) UTC 时间 08:00 运行一次
+    - cron: '0 8 * * 1-5'
+  workflow_dispatch:
 
 jobs:
   scrape-jobs:
