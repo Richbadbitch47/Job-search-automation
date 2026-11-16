@@ -26,4 +26,5 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+          GAS_WEBAPP_URL: ${{ secrets.GAS_WEBAPP_URL }}
         run: python main.py
